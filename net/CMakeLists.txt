@@ -1,0 +1,5 @@
+set(NET_SRC_DIR Src)
+set(NET_INC_DIR Include)
+include_directories(${NET_INC_DIR})
+include_directories(${NET_SRC_DIR})
+add_executable(EventLoop_UnitTest tests/EventLoop_UnitTest.cpp ${NET_SRC_DIR})
