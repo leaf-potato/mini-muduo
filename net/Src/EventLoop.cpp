@@ -69,10 +69,40 @@ void EventLoop::loop() {
         it != activeChannels_.end();it++){
             (*it)->handleEvent();
         }
+        doPendingFunctors();
     }
     LOG_TRACE << "Eventloop "<< this << " stop looping";
     looping_ = false;
 }
 EventLoop *EventLoop::getEventLoopOfCurrentThread() {
     return t_loopInThisThread;
+}
+void EventLoop::runInLoop(const EventLoop::Functor &cb) {
+    if(isInLoopThread()){
+        cb();
+    }else{
+        queueInLoop(cb);
+    }
+}
+void EventLoop::queueInLoop(const EventLoop::Functor &cb) {
+    MutexLockGuard lock(mutex_);
+    pendingFunctors_.push_back(cb);
+    if(!isInLoopThread() || callingPendingFunctors_)
+        wakeUp();
+}
+void EventLoop::doPendingFunctors() {
+    std::vector<Functor>functors;
+    callingPendingFunctors_ = true;
+    {
+        /*
+         * 缩减临界区
+         * 同时为了避免Functor调用queueInLoop而造成死锁
+         */
+        MutexLockGuard lock(mutex_);
+        functors.swap(pendingFunctors_);
+    }
+    for(size_t i = 0;i < functors.size();i++){
+        functors[i]();
+    }
+    callingPendingFunctors_ = false;
 }

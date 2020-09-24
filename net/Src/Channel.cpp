@@ -15,7 +15,7 @@ const int Channel::kReadEvent = POLLIN | POLLPRI;
 const int Channel::kWriteEvent = POLLOUT;
 
 Channel::Channel(EventLoop *loop, int fd)
-:loop_(loop),fd_(fd),events_(0),revents_(0),index_(-1) {
+:loop_(loop),fd_(fd),events_(0),revents_(0),index_(-1),eventHandling_(false) {
 }
 
 void Channel::update() {
@@ -29,7 +29,12 @@ void Channel::handleEvent() {
     /*
      * 根据revents_的值调用不同的回调函数
      */
-    if(revents_ & POLLNVAL){
+    eventHandling_ = true;
+    if((revents_ & POLLHUP) && !(revents_ & POLLIN)){
+        LOG_WARN << "Channel:handleEvent() POLLHUP";
+        if(closeCallBack_)closeCallBack_();
+    }
+    if(revents_ & (POLLNVAL | POLLERR)){
         LOG_WARN << "Channel:handleEvent() POLLNVAL";
     }
     if(revents_ & (POLLERR | POLLNVAL)){
@@ -41,6 +46,9 @@ void Channel::handleEvent() {
     if(revents_ & POLLOUT){
         if(writeCallBack_) writeCallBack_;
     }
+    eventHandling_ = false;
 }
-
+Channel::~Channel() {
+    assert(!eventHandling_);
+}
 

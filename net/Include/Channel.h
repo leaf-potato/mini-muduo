@@ -17,6 +17,7 @@ namespace muduo{
                 //回调函数类型
                 typedef std::function<void ()>EventCallBack;
                 Channel(EventLoop* loop,int fd);
+                ~Channel();
                 void handleEvent();
                 /*
                  * 设置相应的回调函数
@@ -24,9 +25,11 @@ namespace muduo{
                 void setReadCallBack(const EventCallBack& cb){ readCallBack_ = cb; }
                 void setWriteCallBack(const EventCallBack& cb){ writeCallBack_ = cb; }
                 void setErrorCallBack(const EventCallBack& cb){ errorCallBack_ = cb; }
+                void setCloseCallBack(const EventCallBack& cb){closeCallBack_ = cb;}
 
                 int fd()const{ return fd_; }
                 int events()const{ return events_; }
+                //被Poller调用
                 void set_revents(int revt){ revents_ = revt; }
                 bool isNoneEvent()const{ return events_ == kNoneEvent; }
 
@@ -40,7 +43,6 @@ namespace muduo{
                 //被Poller类调用
                 int index(){ return index_; }
                 void set_index(int idx){ index_ = idx; };
-
                 EventLoop* ownerLoop(){ return loop_; }
             private:
                 void update();
@@ -51,6 +53,7 @@ namespace muduo{
 
                 EventLoop* loop_;
                 const int fd_;
+                bool eventHandling_;
                 /*
                  * events是关心的事件
                  * revents是目前活跃的事件
@@ -62,6 +65,7 @@ namespace muduo{
                 EventCallBack readCallBack_;
                 EventCallBack writeCallBack_;
                 EventCallBack errorCallBack_;
+                EventCallBack closeCallBack_;
         };
     }
 }
