@@ -16,6 +16,8 @@ namespace muduo{
         void cachedTid();
         /*
          * 获取当前线程一些信息：线程号,线程名字等给日志使用
+         * 为了防止每次都使用系统调用来获取线程id
+         * 所以通过__thread关键字来缓存线程id
          */
         inline int getTid(){
             if(__builtin_expect(t_cachedTid == 0,0)){
@@ -32,6 +34,7 @@ namespace muduo{
         inline const char* getThreadName(){
             return t_threadName;
         };
+        bool isMainThread();
     }
 }
 #endif //MINI_MUDUO_BASE_CURRENTTHREAD_H_
