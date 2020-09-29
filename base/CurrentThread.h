@@ -4,6 +4,7 @@
 
 #ifndef MINI_MUDUO_BASE_CURRENTTHREAD_H_
 #define MINI_MUDUO_BASE_CURRENTTHREAD_H_
+#include <string>
 namespace muduo{
     namespace CurrentThread{
         /*
@@ -35,6 +36,7 @@ namespace muduo{
             return t_threadName;
         };
         bool isMainThread();
+        std::string stackTrace(bool demangle);
     }
 }
 #endif //MINI_MUDUO_BASE_CURRENTTHREAD_H_
