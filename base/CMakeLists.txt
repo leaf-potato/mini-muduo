@@ -1,1 +1,9 @@
-add_executable(base main.cpp)
+set(Base_Src
+        CurrentThread.cpp
+        Thread.cpp
+        CountDownLatch.cpp)
+
+add_library(muduo_base ${Base_Src})
+target_link_libraries(muduo_base pthread rt)
+
+add_subdirectory(tests)
