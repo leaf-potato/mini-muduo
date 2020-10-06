@@ -3,6 +3,7 @@
 //
 #include "Thread.h"
 #include "Exception.h"
+#include "CurrentThread.h"
 #include <unistd.h>
 #include <sys/prctl.h>
 #include <sys/syscall.h>
@@ -11,6 +12,20 @@ namespace muduo{
         pid_t getTid(){
             return static_cast<pid_t>(::syscall(SYS_gettid));
         }
+        void afterFork(){
+            CurrentThread::t_cachedTid = 0;
+            CurrentThread::t_threadName = "main";
+            CurrentThread::getTid();
+        }
+        class ThreadNameInitializer{
+            public:
+                ThreadNameInitializer(){
+                    CurrentThread::t_threadName = "main";
+                    CurrentThread::getTid();
+                    pthread_atfork(nullptr, nullptr, &afterFork);
+                }
+        };
+        ThreadNameInitializer init;
         class ThreadData{
             public:
                 using ThreadFunc = muduo::Thread::ThreadFunc;
