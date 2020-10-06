@@ -67,10 +67,10 @@ namespace muduo{
                 }
 
                 T getAndDecrement(){
-                    return getAndReduce(-1);
+                    return getAndReduce(1);
                 }
                 T decrementAndGet(){
-                    return reduceAndGet(-1);
+                    return reduceAndGet(1);
                 }
 
                 T getAndSet(T newValue){
@@ -78,9 +78,6 @@ namespace muduo{
                      * 将value的值返回，并设置value为newvalue
                      */
                     return __sync_lock_test_and_set(&value_, newValue);
-                }
-                T setAndGet(T newValue){
-                    return getAndSet(newValue) + newValue;
                 }
             private:
                 volatile T value_;
