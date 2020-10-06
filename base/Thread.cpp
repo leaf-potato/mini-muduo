@@ -73,8 +73,9 @@ namespace muduo{
                 CountDownLatch& latch_;
         };
         void* startThread(void* obj){
-            ThreadData data = *(static_cast<ThreadData*>(obj));
-            data.runInThread();
+            ThreadData *data = static_cast<ThreadData*>(obj);
+            data->runInThread();
+            delete data;
             return nullptr;
         }
     }
@@ -92,7 +93,7 @@ namespace muduo{
     joined_(false),
     pthreadId_(0),
     tid_(0),
-    func_(func),
+    func_(std::move(func)),
     name_(name),
     latch_(1){
         setDefaultName();
@@ -104,9 +105,11 @@ namespace muduo{
          * 必须要调用pthread_create()函数创建线程之后
          * 才能通过gettid函数获取到线程的id，所以pthread_create()中
          * 不能直接执行ThreadFunc，必须对其进行进一步的封装
+         * 这儿必须使用动态内存分配，不然start函数结束，将内存空间释放但新线程还在访问
          */
-        detail::ThreadData data(func_,name_,tid_,latch_);
-        if(pthread_create(&pthreadId_, nullptr,&detail::startThread,&data)){
+        //detail::ThreadData data(func_,name_,tid_,latch_);
+        detail::ThreadData* data = new detail::ThreadData(func_,name_,tid_,latch_);
+        if(pthread_create(&pthreadId_, nullptr,&detail::startThread,data)){
             started_ = false;
         }else{
             /*
