@@ -4,3 +4,5 @@ target_link_libraries(mutex_test muduo_base)
 
 add_executable(atomic_test Atomic_Test.cpp)
 target_link_libraries(atomic_test muduo_base)
+add_executable(currentthread_test CurrentThread_Test.cpp)
+target_link_libraries(currentthread_test muduo_base)
