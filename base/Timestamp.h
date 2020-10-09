@@ -45,7 +45,7 @@ namespace muduo{
                 return getTimestampFromUnixTime(time,0);
             }
             static Timestamp getTimestampFromUnixTime(time_t time ,int microSeconds){
-                return Timestamp(static_cast<int64_t>(time) * kMicroSecondsPerSecond *
+                return Timestamp(static_cast<int64_t>(time) * kMicroSecondsPerSecond +
                 microSeconds);
             }
 
