@@ -6,6 +6,7 @@
 #include <cinttypes>
 #include <sys/time.h>
 using namespace muduo;
+static_assert(sizeof(Timestamp) == sizeof(int64_t), "Timestamp is not same as int64_4");
 
 std::string Timestamp::toString() const {
     char buf[32] = {0};
@@ -41,4 +42,7 @@ Timestamp Timestamp::getNowTimestamp() {
     gettimeofday(&tv, nullptr);
     int64_t seconds = tv.tv_sec;
     return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);
+}
+Timestamp Timestamp::getInvalidTimestamp() {
+    return Timestamp();
 }
