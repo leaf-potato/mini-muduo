@@ -13,3 +13,6 @@ target_link_libraries(thread_test muduo_base)
 
 add_executable(timestamp_test Timestamp_Test.cpp)
 target_link_libraries(timestamp_test muduo_base)
+
+add_executable(date_test Date_Test.cpp)
+target_link_libraries(date_test muduo_base)
